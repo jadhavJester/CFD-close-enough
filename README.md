@@ -59,3 +59,14 @@ python main.py
 - `lbm_solver.py`: Core D2Q9 LBM implementation and force calculators.
 - `airfoils.py`: Math for plotting NACA 4-digit and KFM profiles into grid masks.
 - `visualizations.py`: Fast mapping from velocity fields to visual heatmaps.
+
+## Testing
+
+Run the test suite with:
+
+```bash
+pip install numpy pytest
+python -m pytest -q
+```
+
+The tests in `tests/` cover the NACA/KFM airfoil mask generators and the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour).
