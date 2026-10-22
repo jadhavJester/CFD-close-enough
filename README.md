@@ -65,11 +65,11 @@ python main.py
 Run the test suite with:
 
 ```bash
-pip install numpy pytest
+pip install numpy pygame pytest
 python -m pytest -q
 ```
 
-The tests in `tests/` cover the NACA/KFM airfoil mask generators and the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour).
+The tests in `tests/` cover the NACA/KFM airfoil mask generators, the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour), and the field-to-heatmap conversion in `visualizations.py`. The visualization tests are skipped automatically when `pygame` is not installed.
 
 ## License
 
