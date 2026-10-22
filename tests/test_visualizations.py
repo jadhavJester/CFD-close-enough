@@ -5,14 +5,11 @@ import os
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import numpy as np
-import pygame
 import pytest
 
-from visualizations import add_obstacle_to_surface, field_to_surface
+pygame = pytest.importorskip("pygame")
 
-pytestmark = pytest.mark.skipif(
-    not pygame.get_init() and False, reason="placeholder"
-)
+from visualizations import add_obstacle_to_surface, field_to_surface
 
 
 @pytest.fixture(scope="module", autouse=True)
