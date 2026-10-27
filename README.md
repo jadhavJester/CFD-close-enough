@@ -24,6 +24,13 @@ Ensure you have Python installed, then install the required dependencies:
 pip install numpy pygame
 ```
 
+The 3D mesh export in `geometry.py` additionally needs pyvista, which is
+an optional dependency:
+
+```bash
+pip install pyvista
+```
+
 ## How to Run
 
 Execute the main script to start the simulation:
@@ -59,6 +66,7 @@ python main.py
 - `lbm_solver.py`: Core D2Q9 LBM implementation and force calculators.
 - `airfoils.py`: Math for plotting NACA 4-digit and KFM profiles into grid masks.
 - `visualizations.py`: Fast mapping from velocity fields to visual heatmaps.
+- `geometry.py`: 3D extruded NACA airfoil meshes via pyvista (optional dependency, not used by the 2D wind tunnel).
 
 ## Testing
 
@@ -69,7 +77,7 @@ pip install numpy pygame pytest
 python -m pytest -q
 ```
 
-The tests in `tests/` cover the NACA/KFM airfoil mask generators, the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour), and the field-to-heatmap conversion in `visualizations.py`. The visualization tests are skipped automatically when `pygame` is not installed.
+The tests in `tests/` cover the NACA/KFM airfoil mask generators, the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour), the field-to-heatmap conversion in `visualizations.py`, and the 3D mesh bounds/scaling in `geometry.py`. The visualization tests are skipped automatically when `pygame` is not installed, and the geometry tests when `pyvista` is not installed.
 
 ## License
 

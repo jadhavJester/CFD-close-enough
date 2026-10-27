@@ -12,5 +12,12 @@ dependencies = [
     "pygame",
 ]
 
+[project.optional-dependencies]
+# Only geometry.py (3D NACA mesh export) needs pyvista; the 2D wind tunnel
+# and its tests run without it, and the geometry tests skip gracefully.
+mesh3d = [
+    "pyvista",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
