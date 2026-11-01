@@ -9,6 +9,7 @@ except ImportError:
 from lbm_solver import LBMSolver
 from visualizations import field_to_surface, add_obstacle_to_surface
 from airfoils import generate_naca4, generate_kfm
+from airfoil_params import step_naca_param
 
 def run():
     pygame.init()
@@ -38,14 +39,6 @@ def run():
     input_active = False
     user_text = ''
     
-    def parse_naca(naca_str):
-        if naca_str.startswith('NACA') and len(naca_str) == 8:
-            return int(naca_str[4]), int(naca_str[5]), int(naca_str[6:8])
-        return None
-
-    def build_naca(m, p, t):
-        return f"NACA{m}{p}{t:02d}"
-
     def apply_airfoil():
         if current_airfoil.startswith('NACA'):
             naca_str = current_airfoil[4:]
@@ -53,15 +46,14 @@ def run():
         else:
             try:
                 kfm_type = int(current_airfoil.replace('KFM', ''))
-            except:
+            except ValueError:
                 kfm_type = 2
             mask = generate_kfm((ny, nx), nx//4, ny//2, 80, kfm_type, 0.09, aoa)
-            
+
         obstacle[:] = mask
-        solver.set_obstacle(obstacle)
         solver.reset()
         solver.set_obstacle(obstacle)
-        
+
         # update inlet speed based on total requested speed (cap dimensionless speed for LBM stability)
         total_speed = wind_speed + aircraft_speed
         safe_v_in = 0.15 * (total_speed / 150.0)
@@ -155,35 +147,23 @@ def run():
                         aircraft_speed = max(0.0, aircraft_speed - 10.0)
                         apply_airfoil()
                     elif event.key == pygame.K_q: # Increase camber
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(min(params[0] + 1, 9), params[1], params[2])
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 'q')
+                        apply_airfoil()
                     elif event.key == pygame.K_a: # Decrease camber
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(max(params[0] - 1, 0), params[1], params[2])
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 'a')
+                        apply_airfoil()
                     elif event.key == pygame.K_w: # Increase camber pos
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(params[0], min(params[1] + 1, 9), params[2])
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 'w')
+                        apply_airfoil()
                     elif event.key == pygame.K_s: # Decrease camber pos
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(params[0], max(params[1] - 0, 0), params[2])
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 's')
+                        apply_airfoil()
                     elif event.key == pygame.K_e: # Increase thickness
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(params[0], params[1], min(params[2] + 1, 40))
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 'e')
+                        apply_airfoil()
                     elif event.key == pygame.K_d: # Decrease thickness
-                        params = parse_naca(current_airfoil)
-                        if params:
-                            current_airfoil = build_naca(params[0], params[1], max(params[2] - 1, 1))
-                            apply_airfoil()
+                        current_airfoil = step_naca_param(current_airfoil, 'd')
+                        apply_airfoil()
 
         # Physics computations
         for _ in range(sim_steps_per_frame):
