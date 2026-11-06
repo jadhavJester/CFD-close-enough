@@ -51,7 +51,7 @@ def generate_naca4(shape, cx, cy, chord, naca_string, aoa_deg=0):
     yc = np.zeros_like(x_n_val)
     if p > 0:
         front = x_n_val < p
-        back = slice(None) if p == 0 else ~front # safe check
+        back = ~front
         
         yc[front] = (m / p**2) * (2 * p * x_n_val[front] - x_n_val[front]**2)
         yc[back] = (m / (1 - p)**2) * ((1 - 2 * p) + 2 * p * x_n_val[back] - x_n_val[back]**2)
