@@ -65,6 +65,7 @@ python main.py
 - `main.py`: Application entry point, PyGame event loop, and HUD rendering.
 - `lbm_solver.py`: Core D2Q9 LBM implementation and force calculators.
 - `airfoils.py`: Math for plotting NACA 4-digit and KFM profiles into grid masks.
+- `airfoil_params.py`: Pure helpers for parsing and stepping NACA 4-digit labels (camber/position/thickness), extracted from the event loop so they are unit-testable.
 - `visualizations.py`: Fast mapping from velocity fields to visual heatmaps.
 - `geometry.py`: 3D extruded NACA airfoil meshes via pyvista (optional dependency, not used by the 2D wind tunnel).
 
