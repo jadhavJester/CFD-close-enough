@@ -30,6 +30,11 @@ def test_invalid_naca_string_returns_empty_mask():
     assert not mask.any()
     mask = generate_naca4(SHAPE, CX, CY, CHORD, "00123")
     assert not mask.any()
+    # Non-digit 4-char strings used to crash in int(); they are invalid too.
+    mask = generate_naca4(SHAPE, CX, CY, CHORD, "00a2")
+    assert not mask.any()
+    mask = generate_naca4(SHAPE, CX, CY, CHORD, "abcd")
+    assert not mask.any()
 
 
 def test_thicker_airfoil_covers_more_cells():

@@ -7,7 +7,7 @@ def generate_naca4(shape, cx, cy, chord, naca_string, aoa_deg=0):
     ny, nx = shape
     mask = np.zeros((ny, nx), dtype=bool)
     
-    if len(naca_string) != 4:
+    if len(naca_string) != 4 or not naca_string.isdigit():
         return mask
         
     m = int(naca_string[0]) / 100.0
