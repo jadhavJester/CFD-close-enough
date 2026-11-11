@@ -20,6 +20,15 @@ def test_invalid_naca_length_raises():
         generate_naca_airfoil("00122", 0.0)
 
 
+def test_non_digit_naca_string_raises():
+    # Non-digit 4-char strings used to fall through to int() and raise a
+    # bare "invalid literal" ValueError instead of the clear message.
+    with pytest.raises(ValueError, match="exactly 4 digits"):
+        generate_naca_airfoil("00a2", 0.0)
+    with pytest.raises(ValueError, match="exactly 4 digits"):
+        generate_naca_airfoil("abcd", 0.0)
+
+
 def test_symmetric_airfoil_bounds_match_chord_and_span():
     # NACA 0012, chord 1, span 1: centred on the quarter-chord point,
     # half-thickness 0.06 each side, span centred on z = 0.

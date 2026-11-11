@@ -5,7 +5,7 @@ def generate_naca_airfoil(naca_str, aoa_deg, chord=1.0, span=1.0, num_points=200
     """
     Generates a 3D extruded PyVista mesh of a NACA 4-digit airfoil.
     """
-    if len(naca_str) != 4:
+    if len(naca_str) != 4 or not naca_str.isdigit():
         raise ValueError("NACA string must be exactly 4 digits")
 
     m = int(naca_str[0]) / 100.0
