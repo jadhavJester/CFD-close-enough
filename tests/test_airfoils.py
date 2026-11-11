@@ -56,3 +56,26 @@ def test_kfm_types_nonempty():
         mask = generate_kfm(SHAPE, CX, CY, CHORD, kfm_type)
         assert mask.shape == SHAPE
         assert mask.sum() > 50, f"KFM-{kfm_type} mask unexpectedly small"
+
+
+def _top_edge_px(mask, chord_frac):
+    """Height of the mask's top edge above CY at a chord fraction."""
+    x = int(CX - CHORD / 2 + chord_frac * CHORD)
+    rows = np.where(mask[:, x])[0]
+    assert len(rows) > 0
+    return CY - rows.min()
+
+
+def test_kfm3_has_two_distinct_top_steps():
+    # KFM-3 steps down twice on top: full thickness before 50% chord,
+    # 0.70x thickness between 50% and 75%, thin base after 75%.
+    # (Regression: the first step used to be overwritten by the second,
+    # so the top was flat 0.70x thickness all the way to 75%.)
+    mask = generate_kfm(SHAPE, CX, CY, CHORD, 3, thickness_pct=0.09)
+    top_25 = _top_edge_px(mask, 0.25)
+    top_60 = _top_edge_px(mask, 0.60)
+    top_85 = _top_edge_px(mask, 0.85)
+    assert top_25 > top_60 > top_85
+    # Step heights track the design fractions of the chord (within a pixel).
+    assert abs(top_25 - 0.09 * CHORD) <= 1
+    assert abs(top_60 - 0.70 * 0.09 * CHORD) <= 1

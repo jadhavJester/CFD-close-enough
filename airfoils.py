@@ -123,9 +123,12 @@ def generate_kfm(shape, cx, cy, chord, kfm_type, thickness_pct=0.09, aoa_deg=0):
         # Top step at 50%
         y_upper = np.where(x_n_val < 0.50, thickness, y_upper)
     elif kfm_type == 3:
-        # Two top steps at 50%, 75%
-        step1 = np.where(x_n_val < 0.50, thickness, y_upper)
-        y_upper = np.where(x_n_val < 0.75, thickness * 0.70, step1)
+        # Two top steps at 50%, 75%: full thickness before 50%,
+        # 0.70x thickness between 50% and 75%, thin base after 75%.
+        y_upper = np.where(x_n_val < 0.50, thickness, y_upper)
+        y_upper = np.where(
+            (x_n_val >= 0.50) & (x_n_val < 0.75), thickness * 0.70, y_upper
+        )
     elif kfm_type == 4:
         # Sym steps at 50%
         y_upper = np.where(x_n_val < 0.50, thickness, y_upper)
