@@ -32,6 +32,12 @@ class LBMSolver:
 
     def set_obstacle(self, obstacle_mask):
         """Update the boolean mask of solid boundaries"""
+        obstacle_mask = np.asarray(obstacle_mask, dtype=bool)
+        if obstacle_mask.shape != (self.ny, self.nx):
+            raise ValueError(
+                f"obstacle mask shape {obstacle_mask.shape} does not match "
+                f"solver grid {(self.ny, self.nx)}"
+            )
         self.obstacle = obstacle_mask
         self.ux[self.obstacle] = 0
         self.uy[self.obstacle] = 0

@@ -102,3 +102,15 @@ def test_no_obstacle_means_no_forces():
         s.step()
     assert s.lift == 0.0
     assert s.drag == 0.0
+
+
+def test_set_obstacle_rejects_wrong_shape():
+    # A wrong-shaped mask used to fail later with a cryptic boolean-index
+    # error from inside step(); reject it at the call site instead.
+    s = make_solver()
+    with pytest.raises(ValueError, match="does not match solver grid"):
+        s.set_obstacle(np.zeros((5, 5), dtype=bool))
+    # The solver is still usable after the rejected call.
+    s.set_obstacle(np.zeros((s.ny, s.nx), dtype=bool))
+    s.step()
+    assert np.isfinite(s.rho).all()
