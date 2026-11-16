@@ -53,6 +53,7 @@ python main.py
 - `1`: NACA 0012 (Symmetrical)
 - `2`: NACA 2412 (Standard)
 - `3`: NACA 4415 (High Camber)
+- `4`–`7`: KFM-1 to KFM-4 (stepped Kline-Fogleman airfoils)
 - Type a 4-digit number and press `Enter` in the top-right box to load a custom NACA profile.
 
 ### NACA Customization

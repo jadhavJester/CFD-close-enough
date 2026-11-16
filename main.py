@@ -11,6 +11,25 @@ from visualizations import field_to_surface, add_obstacle_to_surface
 from airfoils import generate_naca4, generate_kfm
 from airfoil_params import step_naca_param
 
+# Number-key airfoil presets. Keys 1-3 are the NACA presets; 4-7 select the
+# KFM stepped airfoils, which previously had no key at all even though
+# apply_airfoil() and the README already supported them.
+PRESET_AIRFOILS = {
+    '1': 'NACA0012',
+    '2': 'NACA2412',
+    '3': 'NACA4415',
+    '4': 'KFM1',
+    '5': 'KFM2',
+    '6': 'KFM3',
+    '7': 'KFM4',
+}
+
+
+def preset_airfoil_for_key(key):
+    """Airfoil label for a number-key preset, or None for other keys."""
+    return PRESET_AIRFOILS.get(key)
+
+
 def run():
     pygame.init()
     
@@ -125,14 +144,8 @@ def run():
                     elif event.key == pygame.K_c:
                         obstacle.fill(False)
                         solver.set_obstacle(obstacle)
-                    elif event.key == pygame.K_1:
-                        current_airfoil = 'NACA0012'
-                        apply_airfoil()
-                    elif event.key == pygame.K_2:
-                        current_airfoil = 'NACA2412'
-                        apply_airfoil()
-                    elif event.key == pygame.K_3:
-                        current_airfoil = 'NACA4415'
+                    elif (preset := preset_airfoil_for_key(event.unicode)) is not None:
+                        current_airfoil = preset
                         apply_airfoil()
                     elif event.key == pygame.K_UP: # AOA increment
                         aoa += 1.0
@@ -225,7 +238,7 @@ def run():
         screen.blit(font.render(f"NACA: {user_text}", True, (255, 255, 255)), (input_rect.x + 5, input_rect.y + 8))
         
         # Draw instructions on the bottom
-        text_inst1 = font.render("Draw: L-Click | Erase: R-Click | 'C': Clear | '1-3': Presets | L/R Arrows: Speed | U/D Arrows: AoA", True, (200, 200, 200))
+        text_inst1 = font.render("Draw: L-Click | Erase: R-Click | 'C': Clear | '1-7': Presets | L/R Arrows: Speed | U/D Arrows: AoA", True, (200, 200, 200))
         text_inst2 = font.render("NACA Mod: Q/A (Camber) | W/S (Pos) | E/D (Thickness)", True, (200, 200, 200))
         screen.blit(text_inst1, (10, height - 45))
         screen.blit(text_inst2, (10, height - 25))
