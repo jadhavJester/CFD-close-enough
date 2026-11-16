@@ -1,6 +1,7 @@
 """Tests for lbm_solver.py — D2Q9 Lattice Boltzmann solver."""
 
 import numpy as np
+import pytest
 
 from lbm_solver import LBMSolver
 
@@ -57,3 +58,47 @@ def test_obstacle_velocity_stays_zero():
         s.step()
     assert (s.ux[mask] == 0).all()
     assert (s.uy[mask] == 0).all()
+
+
+def test_block_obstacle_has_positive_drag_and_no_lift():
+    # Regression: calculate_forces used to return the force on the FLUID,
+    # so drag came out negative and the HUD showed e.g. "Drag Force: -X N".
+    # Drag on the obstacle must point downstream (+x); a symmetric block
+    # in the middle of the flow has no lift by symmetry.
+    s = make_solver()
+    mask = np.zeros((s.ny, s.nx), dtype=bool)
+    mask[8:12, 15:20] = True
+    s.set_obstacle(mask)
+    for _ in range(100):
+        s.step()
+    assert np.isfinite([s.lift, s.drag]).all()
+    assert s.drag > 0
+    assert s.lift == pytest.approx(0.0, abs=1e-9)
+
+
+def test_lift_sign_follows_angle_of_attack():
+    # NACA 2412 is cambered, so it lifts a little even at 0 degrees, and
+    # lift grows with angle of attack (nose-up on screen = positive).
+    from airfoils import generate_naca4
+
+    def lift_at(aoa):
+        s = LBMSolver(nx=150, ny=60, tau=0.55)
+        mask = generate_naca4((60, 150), 150 // 4, 60 // 2, 40, "2412", aoa)
+        s.set_obstacle(mask)
+        for _ in range(300):
+            s.step()
+        return s.lift, s.drag
+
+    lift_neg, drag_neg = lift_at(-10)
+    lift_pos, drag_pos = lift_at(10)
+    assert lift_pos > 0 > lift_neg
+    # Drag stays positive (downstream) at either angle of attack.
+    assert drag_pos > 0 and drag_neg > 0
+
+
+def test_no_obstacle_means_no_forces():
+    s = make_solver()
+    for _ in range(50):
+        s.step()
+    assert s.lift == 0.0
+    assert s.drag == 0.0

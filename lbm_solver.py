@@ -116,11 +116,14 @@ class LBMSolver:
         for i in range(1, self.NL):
              momentum_x = self.cxs[i]
              momentum_y = self.cys[i]
-             # Momentum transferred to obstacle when bouncing back
+             # Momentum exchanged at the obstacle when populations bounce back.
+             # This sum is the force on the FLUID: the flow loses +x momentum
+             # to the obstacle, so it comes out negative. Drag on the obstacle
+             # is the reaction to that, hence the minus sign.
              bounce_amount = self.F[self.obstacle, self.opposite[i]]
-             drag += np.sum(2 * bounce_amount * momentum_x)
-             # Note: positive Y in Pygame is down, but in physics up is positive.
-             # We just calculate raw forces, can invert if needed on display.
+             drag -= np.sum(2 * bounce_amount * momentum_x)
+             # Lift needs no sign flip: grid +y points down on screen, so
+             # the y-sum already reads as physical lift (up positive).
              lift += np.sum(2 * bounce_amount * momentum_y)
              
         # Smooth forces for readable output
