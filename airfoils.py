@@ -74,7 +74,15 @@ def generate_kfm(shape, cx, cy, chord, kfm_type, thickness_pct=0.09, aoa_deg=0):
     """
     ny, nx = shape
     mask = np.zeros((ny, nx), dtype=bool)
-    
+
+    # An unknown type used to fall through every step branch and silently
+    # return a flat plate; a zero/negative thickness likewise produced a
+    # degenerate sliver or an empty mask. Fail loudly instead.
+    if kfm_type not in (1, 2, 3, 4):
+        raise ValueError(f"kfm_type must be 1, 2, 3 or 4, got {kfm_type!r}")
+    if thickness_pct <= 0:
+        raise ValueError(f"thickness_pct must be positive, got {thickness_pct!r}")
+
     aoa_rad = np.radians(aoa_deg)
     cos_a = np.cos(-aoa_rad)
     sin_a = np.sin(-aoa_rad)

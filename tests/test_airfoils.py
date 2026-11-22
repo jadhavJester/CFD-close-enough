@@ -1,6 +1,7 @@
 """Tests for airfoils.py — NACA 4-digit and KFM mask generators."""
 
 import numpy as np
+import pytest
 
 from airfoils import generate_kfm, generate_naca4
 
@@ -56,6 +57,23 @@ def test_kfm_types_nonempty():
         mask = generate_kfm(SHAPE, CX, CY, CHORD, kfm_type)
         assert mask.shape == SHAPE
         assert mask.sum() > 50, f"KFM-{kfm_type} mask unexpectedly small"
+
+
+def test_kfm_invalid_type_raises():
+    # An unknown type used to fall through every step branch and silently
+    # return a flat plate with no steps at all.
+    for kfm_type in (0, 5, 99):
+        with pytest.raises(ValueError, match="kfm_type must be 1, 2, 3 or 4"):
+            generate_kfm(SHAPE, CX, CY, CHORD, kfm_type)
+
+
+def test_kfm_nonpositive_thickness_raises():
+    # thickness_pct=0 used to return a degenerate sliver from the
+    # leading-edge rounding alone; a negative value, an empty mask.
+    with pytest.raises(ValueError, match="thickness_pct must be positive"):
+        generate_kfm(SHAPE, CX, CY, CHORD, 2, thickness_pct=0.0)
+    with pytest.raises(ValueError, match="thickness_pct must be positive"):
+        generate_kfm(SHAPE, CX, CY, CHORD, 2, thickness_pct=-0.05)
 
 
 def _top_edge_px(mask, chord_frac):
