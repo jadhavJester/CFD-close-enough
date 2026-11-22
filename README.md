@@ -79,7 +79,7 @@ pip install numpy pygame pytest
 python -m pytest -q
 ```
 
-The tests in `tests/` cover the NACA/KFM airfoil mask generators, the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour), the field-to-heatmap conversion in `visualizations.py`, and the 3D mesh bounds/scaling in `geometry.py`. The visualization tests are skipped automatically when `pygame` is not installed, and the geometry tests when `pyvista` is not installed.
+The tests in `tests/` cover the NACA/KFM airfoil mask generators, the D2Q9 LBM solver (equilibrium, stability, obstacle no-slip behaviour, constructor input validation), the field-to-heatmap conversion in `visualizations.py`, the NACA label parsing/stepping helpers in `airfoil_params.py`, the number-key airfoil presets in `main.py`, and the 3D mesh bounds/scaling in `geometry.py`. The visualization tests are skipped automatically when `pygame` is not installed, and the geometry tests when `pyvista` is not installed.
 
 ## License
 
