@@ -29,6 +29,30 @@ def test_non_digit_naca_string_raises():
         generate_naca_airfoil("abcd", 0.0)
 
 
+def test_too_few_points_raises():
+    # Fewer than 3 points cannot close an airfoil outline: 0/1 used to
+    # return a zero-volume mesh after VTK errors, and 2 a sliver triangle.
+    for num_points in (0, 1, 2):
+        with pytest.raises(ValueError, match="num_points must be at least 3"):
+            generate_naca_airfoil("0012", 0.0, num_points=num_points)
+    # The boundary itself is still a real (if coarse) closed outline.
+    mesh = generate_naca_airfoil("0012", 0.0, num_points=3)
+    assert mesh.volume > 0
+
+
+def test_nonpositive_chord_or_span_raises():
+    # chord=0 used to return a zero-volume mesh, span=0 a flat one, and a
+    # negative chord a silently inverted mesh with positive volume.
+    with pytest.raises(ValueError, match="chord must be positive"):
+        generate_naca_airfoil("0012", 0.0, chord=0.0)
+    with pytest.raises(ValueError, match="chord must be positive"):
+        generate_naca_airfoil("0012", 0.0, chord=-1.0)
+    with pytest.raises(ValueError, match="span must be positive"):
+        generate_naca_airfoil("0012", 0.0, span=0.0)
+    with pytest.raises(ValueError, match="span must be positive"):
+        generate_naca_airfoil("0012", 0.0, span=-0.5)
+
+
 def test_symmetric_airfoil_bounds_match_chord_and_span():
     # NACA 0012, chord 1, span 1: centred on the quarter-chord point,
     # half-thickness 0.06 each side, span centred on z = 0.

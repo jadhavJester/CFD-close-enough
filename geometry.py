@@ -8,6 +8,16 @@ def generate_naca_airfoil(naca_str, aoa_deg, chord=1.0, span=1.0, num_points=200
     if len(naca_str) != 4 or not naca_str.isdigit():
         raise ValueError("NACA string must be exactly 4 digits")
 
+    # Reject degenerate inputs up front: without this they slip through to
+    # pyvista and come back as a zero-volume "mesh" (or, for a negative
+    # chord, a silently inverted one) plus VTK errors on stderr.
+    if num_points < 3:
+        raise ValueError("num_points must be at least 3 to form a closed airfoil outline")
+    if chord <= 0:
+        raise ValueError("chord must be positive")
+    if span <= 0:
+        raise ValueError("span must be positive")
+
     m = int(naca_str[0]) / 100.0
     p = int(naca_str[1]) / 10.0
     t = int(naca_str[2:]) / 100.0
