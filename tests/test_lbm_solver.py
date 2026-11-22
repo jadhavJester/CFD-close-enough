@@ -10,6 +10,25 @@ def make_solver():
     return LBMSolver(nx=40, ny=20, tau=0.55)
 
 
+def test_invalid_grid_size_raises():
+    # A zero-width grid used to die later with a cryptic IndexError inside
+    # step(); a negative size with numpy's "negative dimensions" error.
+    for nx, ny in ((0, 20), (40, 0), (-5, 20)):
+        with pytest.raises(ValueError, match="grid size must be positive"):
+            LBMSolver(nx=nx, ny=ny)
+
+
+def test_tau_must_exceed_half():
+    # tau <= 0.5 means zero/negative kinematic viscosity: tau=0.4 blows
+    # the density field up to ~1e93 within a few hundred steps, and
+    # tau=0 divides by zero in the collision step.
+    for tau in (0.5, 0.4, 0.0, -0.5):
+        with pytest.raises(ValueError, match="tau must be greater than 0.5"):
+            LBMSolver(nx=40, ny=20, tau=tau)
+    # The default stays valid.
+    assert LBMSolver(nx=40, ny=20).tau == 0.55
+
+
 def test_weights_sum_to_one_and_opposites_pair():
     s = make_solver()
     assert np.isclose(s.weights.sum(), 1.0)

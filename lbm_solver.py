@@ -2,6 +2,17 @@ import numpy as np
 
 class LBMSolver:
     def __init__(self, nx=400, ny=150, tau=0.55):
+        # Reject degenerate setups up front: a zero-width grid used to
+        # die later with a cryptic IndexError inside step(), and tau <= 0.5
+        # means zero or negative kinematic viscosity ((tau - 0.5) / 3),
+        # which blows the density field up within a few hundred steps
+        # (tau=0 even divides by zero in the collision step).
+        if nx <= 0 or ny <= 0:
+            raise ValueError(f"grid size must be positive, got nx={nx}, ny={ny}")
+        if tau <= 0.5:
+            raise ValueError(
+                f"tau must be greater than 0.5 for a stable LBM viscosity, got {tau}"
+            )
         self.nx = nx
         self.ny = ny
         self.tau = tau
