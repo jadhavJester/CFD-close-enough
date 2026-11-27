@@ -76,6 +76,17 @@ def test_kfm_nonpositive_thickness_raises():
         generate_kfm(SHAPE, CX, CY, CHORD, 2, thickness_pct=-0.05)
 
 
+def test_nonpositive_chord_raises():
+    # chord=0 used to short-circuit the bounding box and a negative chord
+    # to invert it, both silently returning an empty mask — while the 3D
+    # generator generate_naca_airfoil already rejects chord <= 0.
+    for chord in (0, -80):
+        with pytest.raises(ValueError, match="chord must be positive"):
+            generate_naca4(SHAPE, CX, CY, chord, "2412")
+        with pytest.raises(ValueError, match="chord must be positive"):
+            generate_kfm(SHAPE, CX, CY, chord, 2)
+
+
 def _top_edge_px(mask, chord_frac):
     """Height of the mask's top edge above CY at a chord fraction."""
     x = int(CX - CHORD / 2 + chord_frac * CHORD)

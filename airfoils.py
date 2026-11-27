@@ -4,6 +4,13 @@ def generate_naca4(shape, cx, cy, chord, naca_string, aoa_deg=0):
     """
     Generates a boolean mask on a 2D grid containing a NACA 4-digit airfoil.
     """
+    # A non-positive chord used to slip through to a silently empty mask
+    # (chord=0 short-circuits the bounding box; a negative chord inverts
+    # it) — the same silent-degenerate pattern generate_naca_airfoil
+    # already rejects. Fail loudly instead.
+    if chord <= 0:
+        raise ValueError(f"chord must be positive, got {chord!r}")
+
     ny, nx = shape
     mask = np.zeros((ny, nx), dtype=bool)
     
@@ -82,6 +89,8 @@ def generate_kfm(shape, cx, cy, chord, kfm_type, thickness_pct=0.09, aoa_deg=0):
         raise ValueError(f"kfm_type must be 1, 2, 3 or 4, got {kfm_type!r}")
     if thickness_pct <= 0:
         raise ValueError(f"thickness_pct must be positive, got {thickness_pct!r}")
+    if chord <= 0:
+        raise ValueError(f"chord must be positive, got {chord!r}")
 
     aoa_rad = np.radians(aoa_deg)
     cos_a = np.cos(-aoa_rad)
