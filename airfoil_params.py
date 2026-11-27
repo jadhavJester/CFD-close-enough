@@ -27,6 +27,19 @@ def build_naca(m, p, t):
     return f"NACA{m}{p}{t:02d}"
 
 
+def is_valid_typed_naca(user_text):
+    """Whether a string typed in the NACA input box is a usable airfoil.
+
+    The box accepts any 4 digits, but thickness 00 is degenerate:
+    ``generate_naca4`` renders it as a 1-pixel line, not an airfoil, and
+    the Q/A/W/S/E/D stepping rules already clamp thickness to 1-40. The
+    input box rejects it like any other unusable label.
+    """
+    if len(user_text) != 4 or not user_text.isdigit():
+        return False
+    return int(user_text[2:]) >= 1
+
+
 def step_naca_param(airfoil_str, key):
     """Apply one Q/A/W/S/E/D keyboard step to a NACA label.
 

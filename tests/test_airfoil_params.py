@@ -1,6 +1,6 @@
 """Tests for airfoil_params.py — the NACA 4-digit label stepping helpers."""
 
-from airfoil_params import build_naca, parse_naca, step_naca_param
+from airfoil_params import build_naca, is_valid_typed_naca, parse_naca, step_naca_param
 
 
 def test_parse_naca_valid_label():
@@ -53,3 +53,15 @@ def test_step_naca_param_leaves_non_naca_labels_untouched():
 def test_step_naca_param_keys_are_case_insensitive():
     assert step_naca_param("NACA2412", "S") == "NACA2312"
     assert step_naca_param("NACA2412", "Q") == "NACA3412"
+
+
+def test_is_valid_typed_naca():
+    assert is_valid_typed_naca("2412")
+    assert is_valid_typed_naca("0012")  # symmetric, zero camber is fine
+    # Thickness 00 renders as a 1-pixel line, not an airfoil.
+    assert not is_valid_typed_naca("0000")
+    assert not is_valid_typed_naca("2400")
+    # Wrong length / non-digits are rejected like before.
+    assert not is_valid_typed_naca("012")
+    assert not is_valid_typed_naca("24122")
+    assert not is_valid_typed_naca("00a2")

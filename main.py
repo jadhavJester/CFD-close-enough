@@ -9,7 +9,7 @@ except ImportError:
 from lbm_solver import LBMSolver
 from visualizations import field_to_surface, add_obstacle_to_surface
 from airfoils import generate_naca4, generate_kfm
-from airfoil_params import step_naca_param
+from airfoil_params import is_valid_typed_naca, step_naca_param
 
 # Number-key airfoil presets. Keys 1-3 are the NACA presets; 4-7 select the
 # KFM stepped airfoils, which previously had no key at all even though
@@ -125,7 +125,7 @@ def run():
             elif event.type == pygame.KEYDOWN:
                 if input_active:
                     if event.key == pygame.K_RETURN:
-                        if len(user_text) == 4 and user_text.isdigit():
+                        if is_valid_typed_naca(user_text):
                             current_airfoil = f'NACA{user_text}'
                             apply_airfoil()
                         input_active = False
